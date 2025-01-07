@@ -1,0 +1,14 @@
+{
+    "type": "code",
+    "modid": "rpgoverlay",
+    "name": "RPGOverlay",
+    "authors": [
+        "BoboDev"
+    ],
+    "description": "Add a health tier and entity level to the looking entities",
+    "version": "1.0.0",
+    "side": "universal",
+    "dependencies": {
+        "game": ""
+    }
+}

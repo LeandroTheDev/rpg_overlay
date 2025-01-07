@@ -1,0 +1,7 @@
+{
+    "healthTierPerHealth": 5,
+    "damageTierPerDamage": 3,
+    "levelPerDamage": 3,
+    "levelPerHealth": 2,
+    "enableExtendedLogs": false
+}
