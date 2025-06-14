@@ -1,13 +1,14 @@
 ﻿using System;
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
+using Vintagestory.API.Server;
 namespace RPGOverlay;
 
 public class Initialization : ModSystem
 {
     private readonly Overwrite overwriter = new();
+    static private IServerNetworkChannel levelUpCommunicationChannel;
 
     public override void Start(ICoreAPI api)
     {
@@ -15,9 +16,39 @@ public class Initialization : ModSystem
         overwriter.OverwriteNativeFunctions();
     }
 
-    public override void StartClientSide(ICoreClientAPI api)
+    public override void StartServerSide(ICoreServerAPI api)
     {
-        base.StartClientSide(api);
+        base.StartServerSide(api);
+        if (Configuration.enableLevelUPGlobalLevel && api.ModLoader.IsModEnabled("levelup"))
+        {
+            EntityOverlay.ShouldEnablePlayerLevel = true;
+            levelUpCommunicationChannel = api.Network.GetChannel("LevelUPServer").RegisterMessageType(typeof(LevelUP.ServerMessage));
+            LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnPlayerExperienceIncrease;
+        }
+    }
+
+    private void LevelUPOnPlayerExperienceIncrease(IPlayer player, string type, ref ulong amount)
+    {
+        if (type != "Global")
+        {
+            // Increase global levels
+            LevelUP.Server.Experience.IncreaseExperience(player, "Global", amount);
+
+            // Check if player level up
+            int previousLevel = player.Entity.WatchedAttributes.GetInt("LevelUP_Level_Global");
+            ulong exp = LevelUP.Server.Experience.GetExperience(player, "Global");
+            int nextLevel = Configuration.GlobalGetLevelByEXP(exp);
+
+            // Update global for level up
+            player.Entity.WatchedAttributes.SetLong("LevelUP_Global", (long)exp);
+            player.Entity.WatchedAttributes.SetInt("LevelUP_Level_Global", nextLevel);
+            // Update global for rpg overlay
+            player.Entity.WatchedAttributes.SetInt("RPGOverlayEntityLevel", nextLevel);
+
+            // Send message if player level up
+            if (previousLevel < nextLevel && player is IServerPlayer serverPlayer)
+                levelUpCommunicationChannel.SendPacket(new LevelUP.ServerMessage() { message = $"playerlevelup&{nextLevel}&{"Global"}" }, serverPlayer);
+        }
     }
 
     public override void AssetsLoaded(ICoreAPI api)
@@ -28,8 +59,7 @@ public class Initialization : ModSystem
 
     public static void SetInfoTexts(Entity entity)
     {
-        if (Configuration.enableExtendedLogs)
-            Debug.Log($"Setting Info text for {entity.Code}");
+        Debug.LogDebug($"Setting Info text for {entity.Code}");
         // Adding the health tier
         if (entity.WatchedAttributes.HasAttribute("extraInfoText"))
             entity.WatchedAttributes.GetTreeAttribute("extraInfoText")
@@ -44,20 +74,17 @@ public class Initialization : ModSystem
 
     public static int CalculateEntityLevel(Entity entity)
     {
-        if (Configuration.enableExtendedLogs)
-            Debug.Log($"Calculating entity {entity.Code} level");
+        Debug.LogDebug($"Calculating entity {entity.Code} level");
 
         // Getting level by damage
         int level = (int)Math.Round(entity.WatchedAttributes.GetFloat("RPGOverlayEntityDamage") / Configuration.levelPerDamage);
 
-        if (Configuration.enableExtendedLogs)
-            Debug.Log($"Level by damage {level}");
+        Debug.LogDebug($"Level by damage {level}");
 
         // Getting level by health
         level += (int)Math.Round(entity.WatchedAttributes.GetFloat("RPGOverlayEntityHealth") / Configuration.levelPerHealth);
 
-        if (Configuration.enableExtendedLogs)
-            Debug.Log($"Level by health and damage {level}");
+        Debug.LogDebug($"Level by health and damage {level}");
 
         return level;
     }
@@ -67,22 +94,33 @@ public class Initialization : ModSystem
         base.Dispose();
         overwriter.instance?.UnpatchAll();
     }
+
+    public override double ExecuteOrder()
+    {
+        return 1.1;
+    }
 }
 
 public class Debug
 {
-    private static readonly OperatingSystem system = Environment.OSVersion;
-    static private ILogger loggerForNonTerminalUsers;
+    static private ILogger logger;
 
-    static public void LoadLogger(ILogger logger) => loggerForNonTerminalUsers = logger;
+    static public void LoadLogger(ILogger _logger) => logger = _logger;
     static public void Log(string message)
     {
-        // Check if is linux or other based system and if the terminal is active for the logs to be show
-        if (system.Platform == PlatformID.Unix || system.Platform == PlatformID.Other || Environment.UserInteractive)
-            // Based terminal users
-            Console.WriteLine($"{DateTime.Now:d.M.yyyy HH:mm:ss} [RPGOverlay] {message}");
-        else
-            // Unbased non terminal users
-            loggerForNonTerminalUsers?.Log(EnumLogType.Notification, $"[RPGOverlay] {message}");
+        logger?.Log(EnumLogType.Notification, $"[RPGOverlay] {message}");
+    }
+    static public void LogDebug(string message)
+    {
+        if (Configuration.enableExtendedLogs)
+            logger?.Log(EnumLogType.Debug, $"[RPGOverlay] {message}");
+    }
+    static public void LogWarn(string message)
+    {
+        logger?.Log(EnumLogType.Warning, $"[RPGOverlay] {message}");
+    }
+    static public void LogError(string message)
+    {
+        logger?.Log(EnumLogType.Error, $"[RPGOverlay] {message}");
     }
 }

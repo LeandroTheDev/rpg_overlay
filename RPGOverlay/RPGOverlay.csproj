@@ -21,6 +21,15 @@
     </Reference>
   </ItemGroup>
 
+  <!-- DELETE THIS IF YOU DON'T PLAN TO USE LEVELUP -->
+  <!-- Also delete the files for levelup compatibility -->
+  <ItemGroup>
+    <Reference Include="LevelUP">
+      <HintPath>$(VINTAGE_STORY)/Mods/levelup/LevelUP.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
   <ItemGroup>
     <Reference Include="VSSurvivalMod">
       <HintPath>$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll</HintPath>
