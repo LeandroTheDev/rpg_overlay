@@ -1,5 +1,5 @@
 # RPG Overlay
-Add level after the entity name showing their power, the level is calculated based on entity damage and max health, works perfect with [RPG Difficulty](https://github.com/LeandroTheDev/rpg_difficulty) but is not necessary
+Add level after the entity name showing their power, the level is calculated based on entity damage and max health, works perfect with [RPG Difficulty](https://mods.vintagestory.at/rpgdifficulty) but is not necessary
 
 If [LevelUP](https://mods.vintagestory.at/levelup) is enabled the mod will also create a custom level "Global" that will increase every time the player gets experience, and the level will be show after the player name
 
