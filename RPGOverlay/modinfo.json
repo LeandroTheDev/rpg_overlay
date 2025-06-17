@@ -6,7 +6,7 @@
         "BoboDev"
     ],
     "description": "Add a health tier and entity level to the looking entities",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "side": "universal",
     "dependencies": {
         "game": ""

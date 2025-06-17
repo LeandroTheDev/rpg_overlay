@@ -8,7 +8,6 @@ namespace RPGOverlay;
 public class Initialization : ModSystem
 {
     private readonly Overwrite overwriter = new();
-    static private IServerNetworkChannel levelUpCommunicationChannel;
 
     public override void Start(ICoreAPI api)
     {
@@ -22,7 +21,6 @@ public class Initialization : ModSystem
         if (Configuration.enableLevelUPGlobalLevel && api.ModLoader.IsModEnabled("levelup"))
         {
             EntityOverlay.ShouldEnablePlayerLevel = true;
-            levelUpCommunicationChannel = api.Network.GetChannel("LevelUPServer").RegisterMessageType(typeof(LevelUP.ServerMessage));
             LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnPlayerExperienceIncrease;
         }
     }
@@ -47,7 +45,7 @@ public class Initialization : ModSystem
 
             // Send message if player level up
             if (previousLevel < nextLevel && player is IServerPlayer serverPlayer)
-                levelUpCommunicationChannel.SendPacket(new LevelUP.ServerMessage() { message = $"playerlevelup&{nextLevel}&{"Global"}" }, serverPlayer);
+                LevelUP.Server.Instance.CommunicationChannel.SendPacket(new LevelUP.ServerMessage() { message = $"playerlevelup&{nextLevel}&{"Global"}" }, serverPlayer);
         }
     }
 
