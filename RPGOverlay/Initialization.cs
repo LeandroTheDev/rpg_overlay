@@ -21,6 +21,7 @@ public class Initialization : ModSystem
         if (Configuration.enableLevelUPGlobalLevel && api.ModLoader.IsModEnabled("levelup"))
         {
             EntityOverlay.ShouldEnablePlayerLevel = true;
+            LevelUP.Configuration.RegisterNewLevelTypeEXP("Global", Configuration.GlobalGetLevelByEXP);
             LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnPlayerExperienceIncrease;
         }
     }
