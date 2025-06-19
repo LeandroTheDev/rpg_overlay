@@ -41,6 +41,7 @@ public static class Configuration
                 // Saving default configurations
                 string defaultJson = JsonConvert.SerializeObject(loadedConfig, Formatting.Indented);
                 File.WriteAllText(configPath, defaultJson);
+                return LoadConfigurationByDirectoryAndName(api, directory, name, defaultDirectory);
             }
             catch (Exception ex)
             {
@@ -60,6 +61,7 @@ public static class Configuration
                 // Saving default configurations
                 string defaultJson = JsonConvert.SerializeObject(loadedConfig, Formatting.Indented);
                 File.WriteAllText(configPath, defaultJson);
+                return LoadConfigurationByDirectoryAndName(api, directory, name, defaultDirectory);
             }
             catch (Exception ex)
             {
