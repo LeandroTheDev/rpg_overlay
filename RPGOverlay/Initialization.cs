@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
@@ -20,15 +24,20 @@ public class Initialization : ModSystem
         base.StartServerSide(api);
         if (Configuration.enableLevelUPGlobalLevel && api.ModLoader.IsModEnabled("levelup"))
         {
-            EntityOverlay.ShouldEnablePlayerLevel = true;
-            foreach (string playerClass in LevelUP.Configuration.ClassExperience.Keys)
-                LevelUP.Configuration.RegisterNewClassLevel(playerClass, "Global", 1.0f);
-            LevelUP.Configuration.RegisterNewLevelTypeEXP("Global", Configuration.GlobalGetLevelByEXP);
-            LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnPlayerExperienceIncrease;
+            // Task is necessary so it will not cry for missing assembly when levelup is not present
+            Task.Run(() =>
+            {
+                EntityOverlay.ShouldEnablePlayerLevel = true;
+                foreach (string playerClass in LevelUP.Configuration.ClassExperience.Keys)
+                    LevelUP.Configuration.RegisterNewClassLevel(playerClass, "Global", 1.0f);
+                LevelUP.Configuration.RegisterNewLevelTypeEXP("Global", Configuration.GlobalGetLevelByEXP);
+                LevelUP.Configuration.RegisterNewMaxLevelByLevelTypeEXP("Global", 999);
+                LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnPlayerExperienceIncrease;
+            });
         }
     }
 
-    private void LevelUPOnPlayerExperienceIncrease(IPlayer player, string type, ref ulong amount)
+    private static void LevelUPOnPlayerExperienceIncrease(IPlayer player, string type, ref ulong amount)
     {
         if (type != "Global")
         {

@@ -35,7 +35,7 @@ public static class Configuration
             // Load default configurations
             loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
 
-            Debug.LogError($"Configurations loaded, saving configs in: {configPath}");
+            Debug.Log($"Configurations loaded, saving configs in: {configPath}");
             try
             {
                 // Saving default configurations
@@ -55,7 +55,7 @@ public static class Configuration
             // Load default configurations
             loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
 
-            Debug.LogError($"Configurations loaded, saving configs in: {configPath}");
+            Debug.Log($"Configurations loaded, saving configs in: {configPath}");
             try
             {
                 // Saving default configurations
