@@ -25,7 +25,7 @@
   <!-- Also delete the files for levelup compatibility -->
   <ItemGroup>
     <Reference Include="LevelUP">
-      <HintPath>$(VINTAGE_STORY)/Mods/levelup/LevelUP.dll</HintPath>
+      <HintPath>$(VINTAGE_STORY_MODS)/levelup/LevelUP.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
