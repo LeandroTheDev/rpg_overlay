@@ -46,9 +46,11 @@ class EntityOverlay
     }
 
     // Overwrite Damage Configuration
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(AiTaskMeleeAttack), "LoadConfig")]
-    public static void LoadConfig(AiTaskMeleeAttack __instance, ref JsonObject taskConfig, JsonObject aiConfig)
+    [HarmonyPatch(typeof(AiTaskMeleeAttack))]
+    [HarmonyPatch(MethodType.Constructor)]
+    [HarmonyPatch(new Type[] { typeof(EntityAgent), typeof(JsonObject), typeof(JsonObject) })]
+    [HarmonyPrefix]
+    public static void LoadConfig(AiTaskMeleeAttack __instance, EntityAgent entity, ref JsonObject taskConfig, JsonObject aiConfig)
     {
         if (__instance.entity == null) return;
         if (__instance.entity.Api.Side != EnumAppSide.Server) return;
