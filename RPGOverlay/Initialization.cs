@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -29,7 +26,7 @@ public class Initialization : ModSystem
             {
                 EntityOverlay.ShouldEnablePlayerLevel = true;
                 foreach (string playerClass in LevelUP.Configuration.ClassExperience.Keys)
-                    LevelUP.Configuration.RegisterNewClassLevel(playerClass, "Global", 1.0f);
+                    LevelUP.Configuration.RegisterNewClassLevel(playerClass, "classGlobalLevelMultiply", 1.0f);
                 LevelUP.Configuration.RegisterNewLevelTypeEXP("Global", Configuration.GlobalGetLevelByEXP);
                 LevelUP.Configuration.RegisterNewMaxLevelByLevelTypeEXP("Global", 999);
                 LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnPlayerExperienceIncrease;
