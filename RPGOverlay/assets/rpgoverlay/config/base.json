@@ -1,8 +1,8 @@
 {
     "healthTierPerHealth": 5,
     "damageTierPerDamage": 3,
-    "levelPerDamage": 3,
-    "levelPerHealth": 2,
+    "levelPerDamage": 2,
+    "levelPerHealth": 3,
     "enableLevelUPGlobalLevel": true,
     "levelUpGlobalEXPPerLevelBase": 1000,
     "levelUpGlobalEXPMultiplyPerLevel": 1.1,
