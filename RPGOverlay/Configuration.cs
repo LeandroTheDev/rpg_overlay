@@ -173,5 +173,19 @@ public static class Configuration
 
         return Math.Max(0, (int)Math.Floor(level));
     }
+
+    public static ulong GlobalGetExpByLevel(int level)
+    {
+        double baseExp = levelUpGlobalEXPPerLevelBase;
+        double multiplier = levelUpGlobalEXPMultiplyPerLevel;
+
+        if (multiplier == 1.0)
+        {
+            return (ulong)(baseExp * level);
+        }
+
+        double exp = baseExp * (Math.Pow(multiplier, level) - 1) / (multiplier - 1);
+        return (ulong)Math.Floor(exp);
+    }
     #endregion
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using HarmonyLib;
 using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common;
@@ -46,51 +47,36 @@ class EntityOverlay
     }
 
     // Overwrite Damage Configuration
-    [HarmonyPatch(typeof(AiTaskMeleeAttack))]
-    [HarmonyPatch(MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(EntityAgent), typeof(JsonObject), typeof(JsonObject) })]
-    [HarmonyPrefix]
-    public static void LoadConfig(AiTaskMeleeAttack __instance, EntityAgent entity, ref JsonObject taskConfig, JsonObject aiConfig)
+    [HarmonyPatch(typeof(AiTaskMeleeAttack), MethodType.Constructor, [typeof(EntityAgent), typeof(JsonObject), typeof(JsonObject)])]
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.VeryLow)]
+    public static void LoadConfig(AiTaskMeleeAttack __instance, EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig)
     {
-        if (__instance.entity == null) return;
-        if (__instance.entity.Api.Side != EnumAppSide.Server) return;
+        // The damage property is already set, this harmony should be the last one to execute
+        // so other mods can modify damage if needed
+        FieldInfo protectedDamage = AccessTools.Field(typeof(AiTaskMeleeAttack), "damage");
+        float damage = (float)protectedDamage.GetValue(__instance);
 
-        Debug.LogDebug($"Calculating entity datas for {__instance.entity.Code}, damage: {taskConfig["damage"].AsFloat(2f)}, max health: {__instance.entity.GetBehavior<EntityBehaviorHealth>()?.BaseMaxHealth}");
+        Debug.Log($"Calculating entity datas for {entity.Code}, damage: {damage}, max health: {entity.GetBehavior<EntityBehaviorHealth>()?.BaseMaxHealth}");
 
-        __instance.entity.WatchedAttributes.SetFloat("RPGOverlayEntityDamage", taskConfig["damage"].AsFloat(2f));
-        __instance.entity.WatchedAttributes.SetFloat("RPGOverlayEntityHealth", __instance.entity.GetBehavior<EntityBehaviorHealth>()?.BaseMaxHealth ?? 0.0f);
-        __instance.entity.WatchedAttributes.SetInt("RPGOverlayEntityLevel", Initialization.CalculateEntityLevel(__instance.entity));
-
-        Debug.LogDebug($"Damage: {__instance.entity.WatchedAttributes.GetFloat("RPGOverlayEntityDamage")}, Health: {__instance.entity.WatchedAttributes.GetFloat("RPGOverlayEntityHealth")}, Level: {__instance.entity.WatchedAttributes.GetInt("RPGOverlayEntityLevel")}");
-
-        Initialization.SetInfoTexts(__instance.entity);
+        entity.WatchedAttributes.SetFloat("RPGOverlayEntityDamage", damage);
+        entity.WatchedAttributes.SetFloat("RPGOverlayEntityHealth", entity.GetBehavior<EntityBehaviorHealth>()?.BaseMaxHealth ?? 0.0f);
+        entity.WatchedAttributes.SetInt("RPGOverlayEntityLevel", Initialization.CalculateEntityLevel(entity));
 
         #region damage-tier
-        int damageTier = (int)Math.Round(taskConfig["damage"].AsDouble(), Configuration.damageTierPerDamage);
+        int damageTier = (int)Math.Round(damage, Configuration.damageTierPerDamage);
 
-        string data = taskConfig.Token?.ToString();
+        __instance.damageTier = damageTier;
 
-        // Parsing the readonly object into editable object
-        JObject jsonObject;
-        try
-        {
-            jsonObject = JObject.Parse(data);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogDebug($"Invalid json for entity: {__instance.entity.Code}, exception: {ex.Message}");
-            return;
-        }
-
-        // Checking if damage tier exist
-        if (jsonObject.TryGetValue("damageTier", out JToken _))
-        {
-            // Redefining the damage tier
-            jsonObject["damageTier"] = damageTier;
-        }
-
-        // Updating the json
-        taskConfig = new(JToken.Parse(jsonObject.ToString()));
+        entity.WatchedAttributes.SetInt("RPGOverlayEntityDamageTier", damageTier);
         #endregion
+
+        #region health-tier
+        entity.WatchedAttributes.SetInt("RPGOverlayEntityHealthTier", (int)Math.Round(entity.WatchedAttributes.GetFloat("RPGOverlayEntityHealth") / Configuration.healthTierPerHealth));
+        #endregion
+
+        Initialization.SetInfoTexts(entity);
+
+        Debug.Log($"Damage: {entity.WatchedAttributes.GetFloat("RPGOverlayEntityDamage")}, DamageTier: {__instance.damageTier} Health: {entity.WatchedAttributes.GetFloat("RPGOverlayEntityHealth")}, Level: {entity.WatchedAttributes.GetInt("RPGOverlayEntityLevel")}");
     }
 }

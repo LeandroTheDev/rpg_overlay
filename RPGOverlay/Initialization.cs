@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.Server;
 namespace RPGOverlay;
 
@@ -13,6 +14,9 @@ public class Initialization : ModSystem
     public override void Start(ICoreAPI api)
     {
         base.Start(api);
+        Debug.LoadLogger(api.Logger);
+        Debug.Log($"Running on Version: {Mod.Info.Version}");
+
         overwriter.OverwriteNativeFunctions();
     }
 
@@ -28,6 +32,7 @@ public class Initialization : ModSystem
                 foreach (string playerClass in LevelUP.Configuration.ClassExperience.Keys)
                     LevelUP.Configuration.RegisterNewClassLevel(playerClass, "classGlobalLevelMultiply", 1.0f);
                 LevelUP.Configuration.RegisterNewLevelTypeEXP("Global", Configuration.GlobalGetLevelByEXP);
+                LevelUP.Configuration.RegisterNewEXPLevelType("Global", Configuration.GlobalGetExpByLevel);
                 LevelUP.Configuration.RegisterNewMaxLevelByLevelTypeEXP("Global", 999);
                 LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnPlayerExperienceIncrease;
             });
@@ -69,14 +74,11 @@ public class Initialization : ModSystem
         Debug.LogDebug($"Setting Info text for {entity.Code}");
         // Adding the health tier
         if (entity.WatchedAttributes.HasAttribute("extraInfoText"))
-            entity.WatchedAttributes.GetTreeAttribute("extraInfoText")
-                .SetString("hpTier", Lang.Get("rpgoverlay:health-tier", CalculateHealthTier(entity)));
-    }
-
-    public static int CalculateHealthTier(Entity entity)
-    {
-        // Health tier calculation
-        return (int)Math.Round(entity.WatchedAttributes.GetFloat("RPGOverlayEntityHealth") / Configuration.healthTierPerHealth);
+        {
+            ITreeAttribute entityLookInfoText = entity.WatchedAttributes.GetTreeAttribute("extraInfoText");
+            entityLookInfoText.SetString("dmgTier", Lang.Get("Damage tier: {0}", entity.WatchedAttributes.GetInt("RPGOverlayEntityDamageTier")));
+            entityLookInfoText.SetString("hpTier", Lang.Get("rpgoverlay:health-tier", entity.WatchedAttributes.GetInt("RPGOverlayEntityHealthTier")));
+        }
     }
 
     public static int CalculateEntityLevel(Entity entity)
