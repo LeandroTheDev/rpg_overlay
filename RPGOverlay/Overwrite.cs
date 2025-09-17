@@ -57,7 +57,7 @@ class EntityOverlay
         FieldInfo protectedDamage = AccessTools.Field(typeof(AiTaskMeleeAttack), "damage");
         float damage = (float)protectedDamage.GetValue(__instance);
 
-        Debug.Log($"Calculating entity datas for {entity.Code}, damage: {damage}, max health: {entity.GetBehavior<EntityBehaviorHealth>()?.BaseMaxHealth}");
+        Debug.LogDebug($"Calculating entity datas for {entity.Code}, damage: {damage}, max health: {entity.GetBehavior<EntityBehaviorHealth>()?.BaseMaxHealth}");
 
         entity.WatchedAttributes.SetFloat("RPGOverlayEntityDamage", damage);
         entity.WatchedAttributes.SetFloat("RPGOverlayEntityHealth", entity.GetBehavior<EntityBehaviorHealth>()?.BaseMaxHealth ?? 0.0f);
@@ -77,6 +77,6 @@ class EntityOverlay
 
         Initialization.SetInfoTexts(entity);
 
-        Debug.Log($"Damage: {entity.WatchedAttributes.GetFloat("RPGOverlayEntityDamage")}, DamageTier: {__instance.damageTier} Health: {entity.WatchedAttributes.GetFloat("RPGOverlayEntityHealth")}, Level: {entity.WatchedAttributes.GetInt("RPGOverlayEntityLevel")}");
+        Debug.LogDebug($"Damage: {entity.WatchedAttributes.GetFloat("RPGOverlayEntityDamage")}, DamageTier: {__instance.damageTier} Health: {entity.WatchedAttributes.GetFloat("RPGOverlayEntityHealth")}, Level: {entity.WatchedAttributes.GetInt("RPGOverlayEntityLevel")}");
     }
 }

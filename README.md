@@ -3,6 +3,8 @@ Add level after the entity name showing their power, the level is calculated bas
 
 If [LevelUP](https://mods.vintagestory.at/levelup) is enabled the mod will also create a custom level "Global" that will increase every time the player gets experience, and the level will be show after the player name
 
+Why the mod is not server side only? well the client needs the translations for "Health Tier" and "Level" you can force the mod to be serverside only but you will need to make changes in the code to remove the translations
+
 ### Considerations
 Calculations for level is configurable
 

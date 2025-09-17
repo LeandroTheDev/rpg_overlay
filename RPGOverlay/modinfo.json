@@ -7,7 +7,7 @@
     ],
     "description": "Add a health tier and entity level to the looking entities",
     "version": "1.0.7",
-    "side": "server",
+    "side": "universal",
     "dependencies": {
         "game": ""
     }
