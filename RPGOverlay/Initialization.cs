@@ -57,10 +57,6 @@ public class Initialization : ModSystem
             player.Entity.WatchedAttributes.SetInt("LevelUP_Level_Global", nextLevel);
             // Update global for rpg overlay
             player.Entity.WatchedAttributes.SetInt("RPGOverlayEntityLevel", nextLevel);
-
-            // Send message if player level up
-            if (previousLevel < nextLevel && player is IServerPlayer serverPlayer)
-                LevelUP.Server.Instance.CommunicationChannel.SendPacket(new LevelUP.ServerMessage() { message = $"playerlevelup&{nextLevel}&{"Global"}" }, serverPlayer);
         }
     }
 
