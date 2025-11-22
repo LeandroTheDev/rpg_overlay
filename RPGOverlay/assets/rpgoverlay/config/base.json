@@ -5,6 +5,6 @@
     "levelPerHealth": 3,
     "enableLevelUPGlobalLevel": true,
     "levelUpGlobalEXPPerLevelBase": 1000,
-    "levelUpGlobalEXPMultiplyPerLevel": 1.1,
+    "levelUpGlobalEXPMultiplyPerLevel": 1.5,
     "enableExtendedLogs": false
 }

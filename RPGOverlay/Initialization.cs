@@ -31,6 +31,7 @@ public class Initialization : ModSystem
                 EntityOverlay.ShouldEnablePlayerLevel = true;
                 foreach (string playerClass in LevelUP.Configuration.ClassExperience.Keys)
                     LevelUP.Configuration.RegisterNewClassLevel(playerClass, "classGlobalLevelMultiply", 1.0f);
+                LevelUP.Configuration.RegisterNewLevel("Global", true);
                 LevelUP.Configuration.RegisterNewLevelTypeEXP("Global", Configuration.GlobalGetLevelByEXP);
                 LevelUP.Configuration.RegisterNewEXPLevelType("Global", Configuration.GlobalGetExpByLevel);
                 LevelUP.Configuration.RegisterNewMaxLevelByLevelTypeEXP("Global", 999);
